@@ -1,0 +1,62 @@
+export interface Problem {
+  id: number;
+  title: string;
+  description: string;
+  difficulty: string;
+  time_limit_ms: number;
+  memory_limit_mb: number;
+  input_format: string;
+  output_format: string;
+  samples: Array<{ input: string; output: string }>;
+  tags: string[];
+  created_at: string;
+}
+
+export interface ProblemListItem {
+  id: number;
+  title: string;
+  difficulty: string;
+  tags: string[];
+}
+
+export interface ProblemListResponse {
+  total: number;
+  items: ProblemListItem[];
+}
+
+export interface TestResult {
+  case: number;
+  status: string;
+  time_ms: number;
+  memory_kb: number;
+}
+
+export interface Submission {
+  id: number;
+  user_id: number;
+  problem_id: number;
+  language: string;
+  code: string;
+  status: string;
+  time_used_ms: number | null;
+  memory_used_kb: number | null;
+  compile_output: string | null;
+  test_results: TestResult[] | null;
+  created_at: string;
+  judged_at: string | null;
+}
+
+export interface SubmissionListItem {
+  id: number;
+  problem_id: number;
+  language: string;
+  status: string;
+  time_used_ms: number | null;
+  memory_used_kb: number | null;
+  created_at: string;
+}
+
+export interface SubmissionListResponse {
+  total: number;
+  items: SubmissionListItem[];
+}

@@ -1,0 +1,146 @@
+:root {
+  --app-bg: #f7f8fa;
+  --card-shadow: 0 2px 12px rgba(31, 41, 55, 0.06);
+  --card-shadow-hover: 0 8px 28px rgba(31, 41, 55, 0.12);
+  --code-bg: #f2f3f5;
+  --primary: #32ca99;
+}
+
+/* Arco Design 主题色覆盖（牛客青绿，变量为 RGB 三元组，配合 rgb(var(--primary-x)) 使用） */
+body {
+  --primary-1: 232, 250, 243;
+  --primary-2: 208, 245, 231;
+  --primary-3: 166, 237, 207;
+  --primary-4: 124, 228, 181;
+  --primary-5: 82, 218, 157;
+  --primary-6: 50, 202, 153;
+  --primary-7: 38, 168, 126;
+  --primary-8: 28, 134, 101;
+  --primary-9: 20, 100, 76;
+
+  --link-1: 232, 250, 243;
+  --link-2: 208, 245, 231;
+  --link-3: 166, 237, 207;
+  --link-4: 124, 228, 181;
+  --link-5: 82, 218, 157;
+  --link-6: 50, 202, 153;
+  --link-7: 38, 168, 126;
+  --link-8: 28, 134, 101;
+  --link-9: 20, 100, 76;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--app-bg);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: var(--card-shadow);
+}
+
+.app-card .arco-card-header {
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d2129;
+}
+
+.page-title::before {
+  content: "";
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+
+.code-block {
+  margin: 0;
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: "Consolas", "Menlo", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.auth-bg {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #ffffff 0%, #f2fbf7 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: 380px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(50, 202, 153, 0.18);
+}
+
+.auth-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1d2129;
+  text-align: center;
+}
+
+.auth-subtitle {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: #86909c;
+  text-align: center;
+}
+
+.arco-form-item {
+  align-items: center;
+}
+
+.arco-form-label-item {
+  display: flex;
+  align-items: center;
+}
+
+.clickable-row .arco-table-tr {
+  cursor: pointer;
+}
+
+.clickable-row .arco-table-tr:hover td {
+  background-color: #f0faf5;
+}
+
+.sample-box {
+  background: #fafbfc;
+  border: 1px solid #e5e6eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-width: 240px;
+}
+
+.sample-box .sample-label {
+  font-size: 12px;
+  color: #86909c;
+  margin-bottom: 6px;
+}
