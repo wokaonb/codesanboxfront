@@ -1,7 +1,6 @@
 import { Avatar, Button, Dropdown, Layout, Menu } from "@arco-design/web-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { mainNavItems } from "../router/mainNav";
-import logo from "../assets/favicon.svg";
 import { useAuthStore } from "../store/User";
 import { checkAccess } from "../access/checkAccess";
 
@@ -48,7 +47,6 @@ function HeaderLayout() {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <img src={logo} alt="logo" style={{ height: 32, width: 32, display: "block" }} />
         <span style={{ fontSize: 17, fontWeight: 600, color: "#1d2129", whiteSpace: "nowrap" }}>
           CodeSandbox 判题
         </span>
@@ -67,7 +65,11 @@ function HeaderLayout() {
         <Dropdown droplist={userDropList} position="br">
           <div style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
             <Avatar style={{ background: "#32ca99" }}>
-              {user.username.charAt(0).toUpperCase()}
+              {user.avatar ? (
+                <img src={user.avatar} alt="avatar" style={{ width: "100%", height: "100%" }} />
+              ) : (
+                user.username.charAt(0).toUpperCase()
+              )}
             </Avatar>
             <span style={{ color: "#1d2129" }}>{user.username}</span>
           </div>

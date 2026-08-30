@@ -7,7 +7,7 @@ import { useAuthStore } from "../store/User";
 
 interface LoginResponse {
   token: string;
-  user: { id: number; username: string; role: AccessEnum };
+  user: { id: number; username: string; role: AccessEnum; avatar?: string | null };
 }
 
 function Login() {
@@ -20,7 +20,7 @@ function Login() {
     setSubmitting(true);
     try {
       const data = await api.post<LoginResponse>("/auth/login", values);
-      setAuth(data.token, { ...data.user, avatar: "" });
+      setAuth(data.token, { ...data.user, avatar: data.user.avatar ?? "" });
       const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
       navigate(from || "/problems", { replace: true });
     } catch (err) {

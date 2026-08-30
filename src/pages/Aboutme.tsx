@@ -1,6 +1,23 @@
-import { Avatar, Button, Card, Descriptions, Space, Tag, Typography } from "@arco-design/web-react";
+import {
+  Avatar,
+  Button,
+  Card,
+  Descriptions,
+  Form,
+  Input,
+  Message,
+  Modal,
+  Space,
+  Tag,
+  Typography,
+  Upload,
+} from "@arco-design/web-react";
+import type { UploadItem } from "@arco-design/web-react/es/Upload";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../api/request";
 import { useAuthStore } from "../store/User";
+import type { UserInfo } from "../store/User";
 
 const ROLE_LABEL: Record<string, { label: string; color: string }> = {
   admin: { label: "管理员", color: "gold" },
@@ -10,6 +27,44 @@ const ROLE_LABEL: Record<string, { label: string; color: string }> = {
 function Aboutme() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const updateUser = useAuthStore((state) => state.updateUser);
+  const [editVisible, setEditVisible] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editForm] = Form.useForm();
+
+  useEffect(() => {
+    if (editVisible && user) {
+      editForm.setFieldsValue({ username: user.username, email: "" });
+    }
+  }, [editVisible, user, editForm]);
+
+  const onEditSubmit = async (values: { username: string }) => {
+    setSaving(true);
+    try {
+      const data = await api.put<UserInfo>("/auth/me", values);
+      updateUser({ username: data.username, avatar: data.avatar ?? "" });
+      Message.success("资料已更新");
+      setEditVisible(false);
+    } catch (err) {
+      Message.error(err instanceof Error ? err.message : "更新失败");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onAvatarChange = async (fileList: UploadItem[]) => {
+    const file = fileList[fileList.length - 1]?.originFile;
+    if (!file) return;
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const data = await api.postForm<UserInfo>("/auth/me/avatar", form);
+      updateUser({ avatar: data.avatar ?? "" });
+      Message.success("头像已更新");
+    } catch (err) {
+      Message.error(err instanceof Error ? err.message : "头像上传失败");
+    }
+  };
 
   if (!user) {
     return (
@@ -29,9 +84,20 @@ function Aboutme() {
     <Space direction="vertical" size="large" style={{ display: "flex", maxWidth: 640 }}>
       <Card className="app-card">
         <Space align="center" size="large">
-          <Avatar size={64} style={{ background: "#32ca99", fontSize: 28 }}>
-            {user.username.charAt(0).toUpperCase()}
-          </Avatar>
+          <Upload
+            showUploadList={false}
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            autoUpload={false}
+            onChange={onAvatarChange}
+          >
+            <Avatar size={64} style={{ background: "#32ca99", fontSize: 28, cursor: "pointer" }}>
+              {user.avatar ? (
+                <img src={user.avatar} alt="avatar" style={{ width: "100%", height: "100%" }} />
+              ) : (
+                user.username.charAt(0).toUpperCase()
+              )}
+            </Avatar>
+          </Upload>
           <div>
             <Space align="center">
               <Typography.Title heading={4} style={{ margin: 0 }}>
@@ -48,8 +114,16 @@ function Aboutme() {
                 ]}
               />
             </div>
+            <div style={{ marginTop: 8 }}>
+              <Button size="small" onClick={() => setEditVisible(true)}>
+                编辑资料
+              </Button>
+            </div>
           </div>
         </Space>
+        <div style={{ color: "#86909c", fontSize: 12, marginTop: 8 }}>
+          点击头像可上传新头像（png/jpg/webp/gif，不超过 2MB）
+        </div>
       </Card>
 
       <Card className="app-card" title="站点说明">
@@ -71,6 +145,34 @@ function Aboutme() {
           <Tag color="gray">系统错误</Tag>
         </Space>
       </Card>
+
+      <Modal
+        title="编辑资料"
+        visible={editVisible}
+        onCancel={() => setEditVisible(false)}
+        footer={null}
+      >
+        <Form form={editForm} onSubmit={onEditSubmit} style={{ marginTop: 16 }}>
+          <Form.Item
+            field="username"
+            label="用户名"
+            rules={[
+              { required: true, message: "请输入用户名" },
+              { minLength: 3, maxLength: 8, message: "用户名长度 3-8 个字符" },
+            ]}
+          >
+            <Input placeholder="用户名（3-8 个字符）" />
+          </Form.Item>
+          <Form.Item label=" ">
+            <Space>
+              <Button type="primary" htmlType="submit" loading={saving}>
+                保存
+              </Button>
+              <Button onClick={() => setEditVisible(false)}>取消</Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
     </Space>
   );
 }

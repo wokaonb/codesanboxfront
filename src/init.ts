@@ -7,9 +7,11 @@ export function initializeApp() {
 
   if (token) {
     api
-      .get<{ id: number; username: string; role: AccessEnum }>("/auth/me")
+      .get<{ id: number; username: string; role: AccessEnum; avatar?: string | null }>(
+        "/auth/me"
+      )
       .then((data) => {
-        useAuthStore.getState().setUser({ ...data, avatar: "" });
+        useAuthStore.getState().setUser({ ...data, avatar: data.avatar ?? "" });
       })
       .catch(() => {
         useAuthStore.getState().clearAuth();
