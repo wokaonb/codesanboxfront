@@ -32,9 +32,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (response.status === 204) {
     return undefined as T;
   }
-  const data = await response.json();
+  let data: unknown = null;
+  try {
+    data = await response.json();
+  } catch {
+    // 响应不是合法 JSON（如后端未启动时代理返回的 500 纯文本），保持 data 为 null
+  }
   if (!response.ok) {
-    const detail = typeof data.detail === "string" ? data.detail : `请求失败 (${response.status})`;
+    const record = data as Record<string, unknown> | null;
+    const detail =
+      record && typeof record.detail === "string" ? record.detail : `请求失败 (${response.status})`;
     throw new ApiError(response.status, detail);
   }
   return data as T;
