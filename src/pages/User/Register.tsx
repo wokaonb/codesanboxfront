@@ -1,7 +1,7 @@
 import { Button, Card, Form, Input, Link, Message } from "@arco-design/web-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../api/request";
+import { api } from "../../api/request";
 
 function Register() {
   const navigate = useNavigate();

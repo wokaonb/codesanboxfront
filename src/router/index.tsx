@@ -4,9 +4,9 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { ACCESS_ENUM } from "../access/accessEnum";
 import AuthLayout from "../layouts/AuthLayout";
 import MainLayout from "../layouts/MainLayout";
-import Login from "../pages/Login";
+import Login from "../pages/User/Login";
 import NotFound from "../pages/NotFound";
-import Register from "../pages/Register";
+import Register from "../pages/User/Register";
 import RequireRole from "./RequireRole";
 import { mainNavItems } from "./mainNav";
 

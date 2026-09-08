@@ -33,7 +33,11 @@ function AdminProblemList() {
     let cancelled = false;
     const load = async () => {
       try {
-        const params = new URLSearchParams({ page: String(page), page_size: String(pageSize) });
+        const params = new URLSearchParams({
+          page: String(page),
+          page_size: String(pageSize),
+          include_hidden: "true",
+        });
         const data = await api.get<ProblemListResponse>(`/problems?${params.toString()}`);
         if (cancelled) return;
         setItems(data.items);
@@ -80,6 +84,21 @@ function AdminProblemList() {
         const info = DIFFICULTY_MAP[value as string] ?? { label: value, color: "gray" };
         return <Tag color={info.color}>{info.label}</Tag>;
       },
+    },
+    {
+      title: "可见性",
+      dataIndex: "is_visible",
+      width: 100,
+      render: (value) => (value ? <Tag color="green">可见</Tag> : <Tag color="gray">已隐藏</Tag>),
+    },
+    {
+      title: "通过率",
+      dataIndex: "acceptance_rate",
+      width: 180,
+      render: (value, record) =>
+        `${record.accepted_count} / ${record.submission_count}（${((value as number) * 100).toFixed(
+          1
+        )}%）`,
     },
     {
       title: "操作",

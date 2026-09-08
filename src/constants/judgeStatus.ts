@@ -7,6 +7,7 @@ export const JUDGE_STATUS: Record<string, JudgeStatusInfo> = {
   Pending: { label: "等待判题", color: "gray" },
   Running: { label: "判题中", color: "blue" },
   Accepted: { label: "通过", color: "green" },
+  Finished: { label: "运行完成", color: "green" },
   "Wrong Answer": { label: "答案错误", color: "red" },
   "Time Limit Exceeded": { label: "超出时间限制", color: "orange" },
   "Memory Limit Exceeded": { label: "超出内存限制", color: "orange" },
@@ -25,6 +26,7 @@ export const JUDGE_STATUS_DESCRIPTION: Record<string, string> = {
 
 export const SUPPORTED_LANGUAGES = [
   { value: "python", label: "Python 3" },
+  { value: "c", label: "C 17" },
   { value: "cpp", label: "C++ 17" },
   { value: "java", label: "Java 17" },
 ];

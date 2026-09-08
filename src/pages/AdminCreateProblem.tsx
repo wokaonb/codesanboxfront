@@ -3,6 +3,8 @@ import type { UploadItem } from "@arco-design/web-react/es/Upload";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/request";
+import SampleEditor from "../components/SampleEditor";
+import type { ProblemSample } from "../types";
 
 interface ProblemFormValues {
   title: string;
@@ -13,6 +15,7 @@ interface ProblemFormValues {
   input_format?: string;
   output_format?: string;
   tags?: string;
+  samples?: ProblemSample[];
 }
 
 function AdminCreateProblem() {
@@ -41,6 +44,7 @@ function AdminCreateProblem() {
         .map((tag) => tag.trim())
         .filter(Boolean);
       formData.append("tags", JSON.stringify(tags));
+      formData.append("samples", JSON.stringify(values.samples ?? []));
       formData.append("test_cases", zipFile);
       await api.postForm("/problems", formData);
       Message.success("创建成功");
@@ -71,7 +75,10 @@ function AdminCreateProblem() {
             label="题目描述"
             rules={[{ required: true, message: "请输入题目描述" }]}
           >
-            <Input.TextArea placeholder="题目描述" autoSize={{ minRows: 5, maxRows: 12 }} />
+            <Input.TextArea
+              placeholder="支持 Markdown 与 $公式$，例如 **加粗**、`代码`、$$a^2+b^2$$"
+              autoSize={{ minRows: 5, maxRows: 12 }}
+            />
           </Form.Item>
           <Form.Item
             field="difficulty"
@@ -130,6 +137,9 @@ function AdminCreateProblem() {
           </Form.Item>
           <Form.Item field="tags" label="标签">
             <Input placeholder="多个标签用逗号分隔，如 数组,排序" />
+          </Form.Item>
+          <Form.Item field="samples" label="样例">
+            <SampleEditor />
           </Form.Item>
           <Form.Item label="测试用例">
             <Upload

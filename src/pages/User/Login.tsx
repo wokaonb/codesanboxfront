@@ -1,9 +1,9 @@
 import { Button, Card, Form, Input, Link, Message } from "@arco-design/web-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { AccessEnum } from "../access/accessEnum";
-import { api } from "../api/request";
-import { useAuthStore } from "../store/User";
+import type { AccessEnum } from "../../access/accessEnum";
+import { api } from "../../api/request";
+import { useAuthStore } from "../../store/User";
 
 interface LoginResponse {
   token: string;

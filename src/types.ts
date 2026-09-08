@@ -1,3 +1,8 @@
+export interface ProblemSample {
+  input: string;
+  output: string;
+}
+
 export interface Problem {
   id: number;
   title: string;
@@ -7,8 +12,12 @@ export interface Problem {
   memory_limit_mb: number;
   input_format: string;
   output_format: string;
-  samples: Array<{ input: string; output: string }>;
+  samples: ProblemSample[];
   tags: string[];
+  is_visible: boolean;
+  submission_count: number;
+  accepted_count: number;
+  acceptance_rate: number;
   created_at: string;
 }
 
@@ -17,6 +26,10 @@ export interface ProblemListItem {
   title: string;
   difficulty: string;
   tags: string[];
+  is_visible: boolean;
+  submission_count: number;
+  accepted_count: number;
+  acceptance_rate: number;
 }
 
 export interface ProblemListResponse {
@@ -29,6 +42,10 @@ export interface TestResult {
   status: string;
   time_ms: number;
   memory_kb: number;
+  detail?: string;
+  stdout?: string;
+  stderr?: string;
+  expected_output?: string;
 }
 
 export interface Submission {
@@ -59,4 +76,14 @@ export interface SubmissionListItem {
 export interface SubmissionListResponse {
   total: number;
   items: SubmissionListItem[];
+}
+
+export interface RunResult {
+  status: string;
+  time_ms: number;
+  memory_kb: number;
+  stdout: string;
+  stderr: string;
+  detail: string;
+  compile_output: string;
 }

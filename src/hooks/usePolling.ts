@@ -4,7 +4,8 @@ export function usePolling<T>(
   fetcher: () => Promise<T>,
   isDone: (data: T) => boolean,
   intervalMs = 1000,
-  timeoutMs?: number
+  timeoutMs?: number,
+  resetKey?: unknown
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +49,7 @@ export function usePolling<T>(
       stopped = true;
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, [intervalMs, timeoutMs]);
+  }, [intervalMs, timeoutMs, resetKey]);
 
   return { data, loading, error };
 }

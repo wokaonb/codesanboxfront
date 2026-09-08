@@ -14,7 +14,8 @@ import type { UploadItem } from "@arco-design/web-react/es/Upload";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api/request";
-import type { Problem } from "../types";
+import SampleEditor from "../components/SampleEditor";
+import type { Problem, ProblemSample } from "../types";
 interface ProblemFormValues {
   title: string;
   description: string;
@@ -24,6 +25,7 @@ interface ProblemFormValues {
   input_format?: string;
   output_format?: string;
   tags?: string;
+  samples?: ProblemSample[];
   is_visible: boolean;
 }
 
@@ -34,6 +36,7 @@ function AdminEditProblem() {
   const [problem, setProblem] = useState<Problem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [testcasesSubmitting, setTestcasesSubmitting] = useState(false);
+  const [rejudging, setRejudging] = useState(false);
   const [zipFile, setZipFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -52,7 +55,8 @@ function AdminEditProblem() {
           input_format: data.input_format,
           output_format: data.output_format,
           tags: (data.tags ?? []).join(","),
-          is_visible: true,
+          samples: data.samples ?? [],
+          is_visible: data.is_visible,
         });
       } catch (err) {
         if (cancelled) return;
@@ -81,6 +85,7 @@ function AdminEditProblem() {
         input_format: values.input_format ?? "",
         output_format: values.output_format ?? "",
         tags,
+        samples: values.samples ?? [],
         is_visible: values.is_visible,
       });
       Message.success("保存成功");
@@ -127,6 +132,24 @@ function AdminEditProblem() {
     });
   };
 
+  const onRejudge = () => {
+    Modal.confirm({
+      title: "重新判题",
+      content: "将该题目的全部提交记录重新排队判题，用于测试用例或资源限制调整后刷新判定结果。",
+      onOk: async () => {
+        setRejudging(true);
+        try {
+          const data = await api.post<{ total: number }>(`/problems/${id}/rejudge`);
+          Message.success(`已重新排队 ${data.total} 条提交记录`);
+        } catch (err) {
+          Message.error(err instanceof Error ? err.message : "重判失败");
+        } finally {
+          setRejudging(false);
+        }
+      },
+    });
+  };
+
   if (!problem) {
     return <Card>加载中...</Card>;
   }
@@ -155,7 +178,10 @@ function AdminEditProblem() {
               label="题目描述"
               rules={[{ required: true, message: "请输入题目描述" }]}
             >
-              <Input.TextArea placeholder="题目描述" autoSize={{ minRows: 5, maxRows: 12 }} />
+              <Input.TextArea
+                placeholder="支持 Markdown 与 $公式$，例如 **加粗**、`代码`、$$a^2+b^2$$"
+                autoSize={{ minRows: 5, maxRows: 12 }}
+              />
             </Form.Item>
             <Form.Item
               field="difficulty"
@@ -215,6 +241,9 @@ function AdminEditProblem() {
             <Form.Item field="tags" label="标签">
               <Input placeholder="多个标签用逗号分隔，如 数组,排序" />
             </Form.Item>
+            <Form.Item field="samples" label="样例">
+              <SampleEditor />
+            </Form.Item>
             <Form.Item field="is_visible" label="是否可见" triggerPropName="checked">
               <Switch />
             </Form.Item>
@@ -222,6 +251,9 @@ function AdminEditProblem() {
               <Space>
                 <Button type="primary" htmlType="submit" loading={submitting}>
                   保存
+                </Button>
+                <Button loading={rejudging} onClick={onRejudge}>
+                  重判全部提交
                 </Button>
                 <Button status="danger" onClick={onDelete}>
                   删除题目

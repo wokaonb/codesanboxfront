@@ -3,8 +3,11 @@ import { java } from "@codemirror/lang-java";
 import { python } from "@codemirror/lang-python";
 import type { Extension } from "@codemirror/state";
 import {
+  Button,
   Card,
   Descriptions,
+  Message,
+  Modal,
   Result,
   Space,
   Spin,
@@ -15,32 +18,74 @@ import {
 } from "@arco-design/web-react";
 import type { ColumnProps } from "@arco-design/web-react/es/Table";
 import CodeMirror from "@uiw/react-codemirror";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { ACCESS_ENUM } from "../access/accessEnum";
 import { api } from "../api/request";
 import { JUDGE_STATUS, JUDGE_STATUS_DESCRIPTION } from "../constants/judgeStatus";
 import { usePolling } from "../hooks/usePolling";
+import { useAuthStore } from "../store/User";
 import type { Submission, TestResult } from "../types";
 
 const LANGUAGE_LABEL: Record<string, string> = {
   python: "Python 3",
+  c: "C 17",
   cpp: "C++ 17",
   java: "Java 17",
 };
 
 const LANGUAGE_EXTENSIONS: Record<string, Extension[]> = {
   python: [python()],
+  c: [cpp()],
   cpp: [cpp()],
   java: [java()],
 };
 
+function OutputBlock({ label, content }: { label: string; content?: string }) {
+  if (!content) {
+    return null;
+  }
+  return (
+    <div>
+      <div className="sample-label">{label}</div>
+      <pre className="code-block">{content}</pre>
+    </div>
+  );
+}
+
 function SubmissionDetail() {
   const { id } = useParams<{ id: string }>();
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.role === ACCESS_ENUM.ADMIN;
+  const [resetKey, setResetKey] = useState(0);
+  const [rejudging, setRejudging] = useState(false);
+
   const { data, loading, error } = usePolling(
     () => api.get<Submission>(`/submissions/${id}`),
-    (s) => s.status !== "Pending" && s.status !== "Running",
+    (submission) => submission.status !== "Pending" && submission.status !== "Running",
     1000,
-    30000
+    30000,
+    resetKey
   );
+
+  const onRejudge = () => {
+    Modal.confirm({
+      title: "重新判题",
+      content: "将这条提交记录重新排队判题，原有的判定结果会被覆盖。",
+      onOk: async () => {
+        setRejudging(true);
+        try {
+          await api.post<Submission>(`/submissions/${id}/rejudge`);
+          Message.success("已重新排队判题");
+          setResetKey((key) => key + 1);
+        } catch (err) {
+          Message.error(err instanceof Error ? err.message : "重判失败");
+        } finally {
+          setRejudging(false);
+        }
+      },
+    });
+  };
 
   if (loading && !data) {
     return <Spin dot style={{ display: "block", margin: "200px auto" }} />;
@@ -77,7 +122,20 @@ function SubmissionDetail() {
       width: 120,
       render: (value) => `${(value / 1024).toFixed(1)} MB`,
     },
+    {
+      title: "说明",
+      dataIndex: "detail",
+      render: (value) => (value ? <Typography.Text type="warning">{value}</Typography.Text> : "-"),
+    },
   ];
+
+  const renderCaseDetail = (record: TestResult) => (
+    <Space direction="vertical" size="small" style={{ display: "flex", padding: "4px 0" }}>
+      <OutputBlock label="期望输出" content={record.expected_output} />
+      <OutputBlock label="实际输出" content={record.stdout || "（无输出）"} />
+      <OutputBlock label="标准错误" content={record.stderr} />
+    </Space>
+  );
 
   return (
     <Space direction="vertical" size="large" style={{ display: "flex" }}>
@@ -89,6 +147,11 @@ function SubmissionDetail() {
           <Tag color={statusInfo.color} size="large">
             {statusInfo.label}
           </Tag>
+          {isAdmin && (
+            <Button size="small" loading={rejudging} onClick={onRejudge}>
+              重判
+            </Button>
+          )}
         </Space>
         {statusDescription && (
           <Typography.Paragraph type="warning" style={{ marginTop: 0 }}>
@@ -130,11 +193,15 @@ function SubmissionDetail() {
 
       {data.test_results && data.test_results.length > 0 && (
         <Card className="app-card" title="测试用例结果">
+          <Typography.Paragraph type="secondary" style={{ marginTop: 0 }}>
+            展开任意一行可查看该用例的实际输出、期望输出与标准错误。
+          </Typography.Paragraph>
           <Table
             rowKey="case"
             data={data.test_results}
             columns={resultColumns}
             pagination={false}
+            expandedRowRender={renderCaseDetail}
           />
         </Card>
       )}

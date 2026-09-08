@@ -83,6 +83,15 @@ function Problems() {
         </Space>
       ),
     },
+    {
+      title: "通过率",
+      dataIndex: "acceptance_rate",
+      width: 180,
+      render: (value, record) =>
+        `${record.accepted_count} / ${record.submission_count}（${((value as number) * 100).toFixed(
+          1
+        )}%）`,
+    },
   ];
 
   return (
