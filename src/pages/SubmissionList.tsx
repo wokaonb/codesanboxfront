@@ -41,6 +41,7 @@ function SubmissionList() {
 
   const columns: ColumnProps<SubmissionListItem>[] = [
     { title: "编号", dataIndex: "id", width: 80 },
+    { title: "提交者", dataIndex: "username", width: 120 },
     { title: "题目编号", dataIndex: "problem_id", width: 100 },
     { title: "语言", dataIndex: "language", width: 100 },
     {

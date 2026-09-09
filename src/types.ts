@@ -51,9 +51,11 @@ export interface TestResult {
 export interface Submission {
   id: number;
   user_id: number;
+  username: string;
   problem_id: number;
   language: string;
-  code: string;
+  code: string | null;
+  code_visible: boolean;
   status: string;
   time_used_ms: number | null;
   memory_used_kb: number | null;
@@ -65,6 +67,8 @@ export interface Submission {
 
 export interface SubmissionListItem {
   id: number;
+  user_id: number;
+  username: string;
   problem_id: number;
   language: string;
   status: string;

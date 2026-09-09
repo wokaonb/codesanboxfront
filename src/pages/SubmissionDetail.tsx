@@ -173,8 +173,9 @@ function SubmissionDetail() {
           />
         </Space>
         <Descriptions
-          column={3}
+          column={4}
           data={[
+            { label: "提交者", value: data.username || `用户 ${data.user_id}` },
             { label: "题目编号", value: String(data.problem_id) },
             { label: "语言", value: LANGUAGE_LABEL[data.language] ?? data.language },
             {
@@ -185,7 +186,7 @@ function SubmissionDetail() {
         />
       </Card>
 
-      {data.status === "Compile Error" && data.compile_output && (
+      {data.code_visible && data.status === "Compile Error" && data.compile_output && (
         <Card className="app-card" title="编译错误信息">
           <pre className="code-block">{data.compile_output}</pre>
         </Card>
@@ -194,28 +195,38 @@ function SubmissionDetail() {
       {data.test_results && data.test_results.length > 0 && (
         <Card className="app-card" title="测试用例结果">
           <Typography.Paragraph type="secondary" style={{ marginTop: 0 }}>
-            展开任意一行可查看该用例的实际输出、期望输出与标准错误。
+            {data.code_visible
+              ? "展开任意一行可查看该用例的实际输出、期望输出与标准错误。"
+              : "他人的提交只展示用例判定结果，代码与输出仅提交者和管理员可见。"}
           </Typography.Paragraph>
           <Table
             rowKey="case"
             data={data.test_results}
             columns={resultColumns}
             pagination={false}
-            expandedRowRender={renderCaseDetail}
+            expandedRowRender={data.code_visible ? renderCaseDetail : undefined}
           />
         </Card>
       )}
 
-      <Card className="app-card" title="提交代码">
-        <CodeMirror
-          value={data.code}
-          extensions={LANGUAGE_EXTENSIONS[data.language] ?? []}
-          height="auto"
-          readOnly
-          basicSetup={{ lineNumbers: true, foldGutter: true }}
-          style={{ fontSize: 13 }}
-        />
-      </Card>
+      {data.code_visible && data.code ? (
+        <Card className="app-card" title="提交代码">
+          <CodeMirror
+            value={data.code}
+            extensions={LANGUAGE_EXTENSIONS[data.language] ?? []}
+            height="auto"
+            readOnly
+            basicSetup={{ lineNumbers: true, foldGutter: true }}
+            style={{ fontSize: 13 }}
+          />
+        </Card>
+      ) : (
+        <Card className="app-card" title="提交代码">
+          <Typography.Text type="secondary">
+            代码、编译输出与用例输出仅提交者本人和管理员可见。
+          </Typography.Text>
+        </Card>
+      )}
     </Space>
   );
 }
