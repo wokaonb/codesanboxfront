@@ -6,6 +6,7 @@ export interface E2EState {
   apiBase: string;
   problemId: number;
   problemTitle: string;
+  problemCreated: boolean;
   admin: { username: string; password: string };
   user: { username: string; password: string };
   adminSubmissionId: number;

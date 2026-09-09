@@ -5,6 +5,7 @@ const baseURL = process.env.E2E_BASE_URL ?? "http://127.0.0.1";
 export default defineConfig({
   testDir: "./tests",
   globalSetup: "./tests/global-setup.ts",
+  globalTeardown: "./tests/global-teardown.ts",
   timeout: 180_000,
   expect: { timeout: 20_000 },
   fullyParallel: false,

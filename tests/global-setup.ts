@@ -105,7 +105,8 @@ export default async function globalSetup(): Promise<void> {
 
     let problemId = Number(process.env.E2E_PROBLEM_ID ?? 0);
     let problemTitle = process.env.E2E_PROBLEM_TITLE ?? "";
-    if (!problemId) {
+    const problemCreated = !problemId;
+    if (problemCreated) {
       problemTitle = `E2E 测试题 ${suffix}`;
       const created = (await requireJson(
         await api.post(`${API_PREFIX}/problems`, {
@@ -146,6 +147,7 @@ export default async function globalSetup(): Promise<void> {
       apiBase: `${BASE_URL}/api/v1`,
       problemId,
       problemTitle,
+      problemCreated,
       admin: { username: ADMIN_USERNAME, password: ADMIN_PASSWORD },
       user: { username, password },
       adminSubmissionId,
